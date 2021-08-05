@@ -29,6 +29,18 @@ jobs:
       with:
         name: java-app
         path: '${{ github.workspace }}/target/*.jar'
+  
+  integrate_test:
+    runs-on: ubuntu-latest
+    name: Run Robot Framework Tests
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Robot Framework
+      uses: joonvena/robotframework-docker-action@v1.0
+    
 
   deploy:
     runs-on: ubuntu-latest
