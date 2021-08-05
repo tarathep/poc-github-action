@@ -8,6 +8,6 @@ public class DemoController{
 
     @GetMapping("/hello")
 	public String Hello(){
-		return "hello web app with JAVA Spring Framework :D 2";
+		return "Hello Demo Github Action 1";
 	}
 }
