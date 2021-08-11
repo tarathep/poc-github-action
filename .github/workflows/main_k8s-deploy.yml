@@ -8,9 +8,9 @@ on:
 
 env:
   REGISTRY_NAME: crwebdemo
-  # CLUSTER_NAME: {cluster-name}
-  # CLUSTER_RESOURCE_GROUP: {resource-group-name}
-  # NAMESPACE: {namespace-name}
+  CLUSTER_NAME: aks-demo-webapp
+  CLUSTER_RESOURCE_GROUP: rg-github-action-001
+  NAMESPACE: default
   # SECRET: {secret-name}
   APP_NAME: webapp
 
@@ -47,19 +47,33 @@ jobs:
         docker build . -t ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
         docker push ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
 
-  integrate_test:
-    runs-on: ubuntu-latest
-    name: Run Robot Framework Tests
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-
-    - name: Robot Framework
-      uses: joonvena/robotframework-docker-action@v1.0
-
-    - name: Upload report
-      uses: actions/upload-artifact@v2
+    # Set the target Azure Kubernetes Service (AKS) cluster. 
+    - uses: azure/aks-set-context@v1
       with:
-        name: report
-        path: '${{ github.workspace }}/robot_tests/*'
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+        cluster-name: ${{ env.CLUSTER_NAME }}
+        resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
+
+
+
+
+
+
+  # integrate_test:
+  #   runs-on: ubuntu-latest
+  #   name: Run Robot Framework Tests
+
+  #   steps:
+  #   - name: Checkout
+  #     uses: actions/checkout@v2
+
+  #   - name: Robot Framework
+  #     uses: joonvena/robotframework-docker-action@v1.0
+  #     with:
+  #         browser: 'firefox'
+
+  #   - name: Upload report
+  #     uses: actions/upload-artifact@v2
+  #     with:
+  #       name: report
+  #       path: '${{ github.workspace }}/robot_tests/*'
