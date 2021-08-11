@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webapp-demo
+  template:
+    metadata:
+      labels:
+        app: webapp-demo
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: webapp-demo
+        image: crwebdemo.azurecr.io/webappdemo:1.0.0
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+        ports:
+        - containerPort: 80
+        # env:
+        # - name: REDIS
+        #   value: "azure-vote-back"
+      imagePullSecrets:
+      - name: secret-docker-image
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-demo
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+  selector:
+    app: webapp-demo
