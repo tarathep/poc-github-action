@@ -18,7 +18,9 @@ jobs:
   unittest:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@dev-aks
+    - uses: actions/checkout@v2
+      with:
+        ref: dev-aks
     
     - name: Set up Java version
       uses: actions/setup-java@v1
