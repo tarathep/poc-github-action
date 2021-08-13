@@ -15,25 +15,6 @@ env:
   APP_NAME: webapp
 
 jobs:
-  checkout:
-    runs-on: ubuntu-latest
-    name: Checkout
-
-    steps:
-    - name: Git Checkout
-      uses: actions/checkout@v2
-      with:
-        ref: dev-aks
-
-    - name: ECHO LS
-      run: ls -al
-
-    # - name: Upload source code for deployment job
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: Source code on github workspace
-    #     path: '${{ github.workspace }}'
-
   unittest:
     name: Unit Test
     needs: checkout
@@ -44,62 +25,66 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: '11'
-    - name: ls -al
-      run: ls -al
 
     - name: Run Unit Test with Maven
       run: mvn test
 
-  # build:
-  #   runs-on: ubuntu-latest
-  #   name: Build Artifact
-  #   needs: unittest
+  build:
+    runs-on: ubuntu-latest
+    name: Build Artifact
+    needs: unittest
 
-  #   steps:
-  #     name: Checkout
-  #   - uses: actions/checkout@v2
-  #     with:
-  #       ref: dev-aks
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        ref: dev-aks
 
-  #   - name: Set up Java version
-  #     uses: actions/setup-java@v1
-  #     with:
-  #       java-version: '11'
+    - name: Set up Java version
+      uses: actions/setup-java@v1
+      with:
+        java-version: '11'
 
-  #   - name: Build with Maven
-  #       run: mvn clean install
+    - name: Build with Maven
+        run: mvn clean install
 
-  #   - name: Upload artifact for deployment job
-  #     uses: actions/upload-artifact@v2
-  #     with:
-  #       name: java-app
-  #       path: '${{ github.workspace }}/target/*.jar'
+    - name: Upload artifact for deployment job
+      uses: actions/upload-artifact@v2
+      with:
+        name: jar file
+        path: '${{ github.workspace }}/target/*.jar'
 
-  # push:
-  #   runs-on: ubuntu-latest
-  #   name: Build Image & Push Azure Container Registry
-  #   needs: 
-  #   - unittest
+  push:
+    runs-on: ubuntu-latest
+    name: Build & Push Image to ACR
+    needs: build
 
-  #   steps:
-  #     name: Checkout
-  #   - uses: actions/checkout@v2
-  #     with:
-  #       ref: dev-aks
+    steps:
+    - name: Download Artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: my-artifact
+        path: '${{ github.workspace }}/target'
+    
+    - name: Display structure of downloaded files
+      run: ls -R
+      working-directory: '${{ github.workspace }}/target'
+      
+    #   # Connect to Azure Container Registry (ACR)
+    # - uses: azure/docker-login@v1
+    #   with:
+    #     login-server: ${{ env.REGISTRY_NAME }}.azurecr.io
+    #     username: ${{ secrets.REGISTRY_USERNAME }} 
+    #     password: ${{ secrets.REGISTRY_PASSWORD }}
+    
+    #   # Container build and push to a Azure Container Registry (ACR)
+    # - run: |
+    #     docker build . -t ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
+    #     docker push ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
 
-  #   - name: Set up Java version
-  #     uses: actions/setup-java@v1
-  #     with:
-  #       java-version: '11'
 
-  #   - name: Build with Maven
-  #       run: mvn clean install
 
-  #   - name: Upload artifact for deployment job
-  #     uses: actions/upload-artifact@v2
-  #     with:
-  #       name: java-app
-  #       path: '${{ github.workspace }}/target/*.jar'
+
 
   # build:
   #   runs-on: ubuntu-latest
