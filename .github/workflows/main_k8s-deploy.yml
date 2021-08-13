@@ -14,6 +14,10 @@ env:
   SECRET: secret-docker-image
   APP_NAME: webapp
 
+defaults:
+  run:
+    working-directory: '${{ github.workspace }}'
+
 jobs:
   checkout:
     runs-on: ubuntu-latest
@@ -25,16 +29,15 @@ jobs:
       with:
         ref: dev-aks
 
-    - name: Upload source code for deployment job
-      uses: actions/upload-artifact@v2
-      with:
-        name: Source code on github workspace
-        path: '${{ github.workspace }}'
+    # - name: Upload source code for deployment job
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: Source code on github workspace
+    #     path: '${{ github.workspace }}'
 
   unittest:
     runs-on: ubuntu-latest
     name: Unit Test
-    needs: checkout
 
     steps:
     - name: Set up Java version
@@ -49,6 +52,32 @@ jobs:
   #   runs-on: ubuntu-latest
   #   name: Build Artifact
   #   needs: unittest
+
+  #   steps:
+  #     name: Checkout
+  #   - uses: actions/checkout@v2
+  #     with:
+  #       ref: dev-aks
+
+  #   - name: Set up Java version
+  #     uses: actions/setup-java@v1
+  #     with:
+  #       java-version: '11'
+
+  #   - name: Build with Maven
+  #       run: mvn clean install
+
+  #   - name: Upload artifact for deployment job
+  #     uses: actions/upload-artifact@v2
+  #     with:
+  #       name: java-app
+  #       path: '${{ github.workspace }}/target/*.jar'
+
+  # push:
+  #   runs-on: ubuntu-latest
+  #   name: Build Image & Push Azure Container Registry
+  #   needs: 
+  #   - unittest
 
   #   steps:
   #     name: Checkout
