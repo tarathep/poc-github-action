@@ -20,8 +20,8 @@ jobs:
     name: Checkout
 
     steps:
-      name: Git Checkout
-    - uses: actions/checkout@v2
+    - name: Git Checkout
+      uses: actions/checkout@v2
       with:
         ref: dev-aks
 
