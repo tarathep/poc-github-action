@@ -26,8 +26,7 @@ jobs:
         ref: dev-aks
 
     - name: ECHO LS
-      run: |
-      ls -al
+      run: ls -al
 
     # - name: Upload source code for deployment job
     #   uses: actions/upload-artifact@v2
@@ -45,11 +44,11 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: '11'
+    - name: ls -al
+      run: ls -al
 
     - name: Run Unit Test with Maven
-      run: |
-      ls -al
-      mvn test
+      run: mvn test
 
   # build:
   #   runs-on: ubuntu-latest
