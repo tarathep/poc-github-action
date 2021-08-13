@@ -25,6 +25,10 @@ jobs:
       with:
         ref: dev-aks
 
+    - name: ECHO LS
+      run: |
+      ls -al
+
     # - name: Upload source code for deployment job
     #   uses: actions/upload-artifact@v2
     #   with:
@@ -32,9 +36,10 @@ jobs:
     #     path: '${{ github.workspace }}'
 
   unittest:
-    # runs-on: ubuntu-latest
     name: Unit Test
-
+    needs: checkout
+    runs-on: ubuntu-latest
+  
     steps:
     - name: Set up Java version
       uses: actions/setup-java@v1
@@ -42,7 +47,9 @@ jobs:
         java-version: '11'
 
     - name: Run Unit Test with Maven
-      run: mvn test
+      run: |
+      ls -al
+      mvn test
 
   # build:
   #   runs-on: ubuntu-latest
