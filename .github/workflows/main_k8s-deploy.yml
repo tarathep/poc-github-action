@@ -26,6 +26,7 @@ jobs:
   unittest:
     runs-on: ubuntu-latest
     name: Unit Test
+    needs: checkout
     steps:
     - name: Set up Java version
       uses: actions/setup-java@v1
