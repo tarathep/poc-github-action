@@ -10,7 +10,7 @@ env:
   REGISTRY_NAME: crwebdemo
   CLUSTER_NAME: aks-demo-webapp
   CLUSTER_RESOURCE_GROUP: rg-github-action-001
-  NAMESPACE: default
+  NAMESPACE: ns-demo-webapp
   SECRET: secret-docker-image
   APP_NAME: webapp
 
