@@ -15,13 +15,18 @@ env:
   APP_NAME: webapp
 
 jobs:
-  unittest:
+  checkout:
     runs-on: ubuntu-latest
+    name: Checkout
     steps:
     - uses: actions/checkout@v2
       with:
         ref: dev-aks
-    
+
+  unittest:
+    runs-on: ubuntu-latest
+    name: Unit Test
+    steps:
     - name: Set up Java version
       uses: actions/setup-java@v1
       with:
