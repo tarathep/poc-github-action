@@ -1,83 +1,96 @@
-name: Build and deploy JAR app to AKS
+name: Build and deploy JAVA App to AKS
 
 on:
   push:
     branches:
-      - main
+      - dev-aks
   workflow_dispatch:
 
 env:
   REGISTRY_NAME: crwebdemo
   CLUSTER_NAME: aks-demo-webapp
   CLUSTER_RESOURCE_GROUP: rg-github-action-001
-  NAMESPACE: ns-demo-webapp
+  NAMESPACE: ns-dev-aks-demo-java-webapp
   SECRET: secret-docker-image
   APP_NAME: webapp
 
 jobs:
-  build:
+  unittest:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@main
-
-    # Build on GITHUB HOST
+    - uses: actions/checkout@dev-aks
+    
     - name: Set up Java version
       uses: actions/setup-java@v1
       with:
         java-version: '11'
 
-    - name: Build with Maven
-      run: mvn clean install
+    - name: run unittest with Maven
+      run: mvn test
 
-    - name: Upload artifact for deployment job
-      uses: actions/upload-artifact@v2
-      with:
-        name: java-app
-        path: '${{ github.workspace }}/target/*.jar'
-    
-    # Connect to Azure Container Registry (ACR)
-    - uses: azure/docker-login@v1
-      with:
-        login-server: ${{ env.REGISTRY_NAME }}.azurecr.io
-        username: ${{ secrets.REGISTRY_USERNAME }} 
-        password: ${{ secrets.REGISTRY_PASSWORD }}
-    
-    # Container build and push to a Azure Container Registry (ACR)
-    - run: |
-        docker build . -t ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
-        docker push ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
+  # build:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@main
 
-    # Set the target Azure Kubernetes Service (AKS) cluster. 
-    - uses: azure/aks-set-context@v1
-      with:
-        creds: '${{ secrets.AZURE_CREDENTIALS }}'
-        cluster-name: ${{ env.CLUSTER_NAME }}
-        resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
+  #   # Build on GITHUB HOST
+  #   - name: Set up Java version
+  #     uses: actions/setup-java@v1
+  #     with:
+  #       java-version: '11'
 
-    # Create namespace if doesn't exist
-    - run: |
-        kubectl create namespace ${{ env.NAMESPACE }} --dry-run -o json | kubectl apply -f -
+  #   - name: Build with Maven
+  #     run: mvn clean install
+
+  #   - name: Upload artifact for deployment job
+  #     uses: actions/upload-artifact@v2
+  #     with:
+  #       name: java-app
+  #       path: '${{ github.workspace }}/target/*.jar'
     
-    # Create image pull secret for ACR
-    - uses: azure/k8s-create-secret@v1
-      with:
-        container-registry-url: ${{ env.REGISTRY_NAME }}.azurecr.io
-        container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
-        container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-        secret-name: ${{ env.SECRET }}
-        namespace: ${{ env.NAMESPACE }}
-        force: true
+  #   # Connect to Azure Container Registry (ACR)
+  #   - uses: azure/docker-login@v1
+  #     with:
+  #       login-server: ${{ env.REGISTRY_NAME }}.azurecr.io
+  #       username: ${{ secrets.REGISTRY_USERNAME }} 
+  #       password: ${{ secrets.REGISTRY_PASSWORD }}
     
-    # Deploy app to AKS
-    - uses: azure/k8s-deploy@v1
-      with:
-        manifests: |
-          aks-deploy.yml
-        images: |
-          ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
-        imagepullsecrets: |
-          ${{ env.SECRET }}
-        namespace: ${{ env.NAMESPACE }}
+  #   # Container build and push to a Azure Container Registry (ACR)
+  #   - run: |
+  #       docker build . -t ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
+  #       docker push ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
+
+  #   # Set the target Azure Kubernetes Service (AKS) cluster. 
+  #   - uses: azure/aks-set-context@v1
+  #     with:
+  #       creds: '${{ secrets.AZURE_CREDENTIALS }}'
+  #       cluster-name: ${{ env.CLUSTER_NAME }}
+  #       resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
+
+  #   # Create namespace if doesn't exist
+  #   - run: |
+  #       kubectl create namespace ${{ env.NAMESPACE }} --dry-run -o json | kubectl apply -f -
+    
+  #   # Create image pull secret for ACR
+  #   - uses: azure/k8s-create-secret@v1
+  #     with:
+  #       container-registry-url: ${{ env.REGISTRY_NAME }}.azurecr.io
+  #       container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
+  #       container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+  #       secret-name: ${{ env.SECRET }}
+  #       namespace: ${{ env.NAMESPACE }}
+  #       force: true
+    
+  #   # Deploy app to AKS
+  #   - uses: azure/k8s-deploy@v1
+  #     with:
+  #       manifests: |
+  #         aks-deploy.yml
+  #       images: |
+  #         ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
+  #       imagepullsecrets: |
+  #         ${{ env.SECRET }}
+  #       namespace: ${{ env.NAMESPACE }}
 
 
 

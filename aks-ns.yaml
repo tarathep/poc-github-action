@@ -1,4 +1,4 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: ns-demo-webapp
+  name: ns-dev-aks-demo-java-webapp

@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: webapp-demo
-  namespace: ns-demo-webapp
+  name: webapp
+  namespace: ns-dev-aks-demo-java-webapp
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: webapp-demo
+      app: webapp
   template:
     metadata:
       labels:
-        app: webapp-demo
+        app: webapp
     spec:
       nodeSelector:
         "beta.kubernetes.io/os": linux
       containers:
-      - name: webapp-demo
+      - name: webapp
         image: crwebdemo.azurecr.io/webapp:latest
         resources:
           requests:
@@ -26,21 +26,21 @@ spec:
             cpu: 250m
             memory: 256Mi
         ports:
-        - containerPort: 80
-        # env:
-        # - name: REDIS
-        #   value: "azure-vote-back"
+        - containerPort: 8080
+        env:
+        - name: server.port
+          value: 8080
       imagePullSecrets:
       - name: secret-docker-image
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: webapp-demo
+  name: webapp
   namespace: ns-demo-webapp
 spec:
   type: LoadBalancer
   ports:
-  - port: 80
+  - port: 8080
   selector:
-    app: webapp-demo
+    app: webapp
