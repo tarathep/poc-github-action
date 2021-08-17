@@ -15,28 +15,28 @@ env:
   APP_NAME: webapp
 
 jobs:
-  unittest:
-    name: Unit Test
-    runs-on: ubuntu-latest
+  # unittest:
+  #   name: Unit Test
+  #   runs-on: ubuntu-latest
   
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        ref: dev-aks
-        
-    - name: Set up Java version
-      uses: actions/setup-java@v1
-      with:
-        java-version: '11'
+  #   steps:
+  #   - name: Checkout
+  #     uses: actions/checkout@v2
+  #     with:
+  #       ref: dev-aks
 
-    - name: Run Unit Test with Maven
-      run: mvn test
+  #   - name: Set up Java version
+  #     uses: actions/setup-java@v1
+  #     with:
+  #       java-version: '11'
+
+  #   - name: Run Unit Test with Maven
+  #     run: mvn test
 
   build:
     runs-on: ubuntu-latest
     name: Build Artifact
-    needs: unittest
+    # needs: unittest
 
     steps:
     - name: Checkout
@@ -55,7 +55,7 @@ jobs:
     - name: Upload artifact for deployment job
       uses: actions/upload-artifact@v2
       with:
-        name: jar file
+        name: binjar
         path: '${{ github.workspace }}/target/*.jar'
 
   push:
@@ -67,7 +67,7 @@ jobs:
     - name: Download Artifact
       uses: actions/download-artifact@v2
       with:
-        name: my-artifact
+        name: binjar
         path: '${{ github.workspace }}/target'
     
     - name: Display structure of downloaded files
