@@ -26,10 +26,10 @@ spec:
             cpu: 250m
             memory: 256Mi
         ports:
-        - containerPort: 8080
+        - containerPort: 80
         env:
         - name: server.port
-          value: 8080
+          value: 80
       imagePullSecrets:
       - name: secret-docker-image
 ---
@@ -41,6 +41,6 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-  - port: 8080
+  - port: 80
   selector:
     app: webapp
